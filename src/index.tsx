@@ -198,7 +198,7 @@ export function useProvisioning({
 	const msg = useRef<MessageInfo>(message)
 	const [bleDevices, setBleDevices] = useState<BleDevice[]>([])
 	const [wifiAPs, setWifiAPs] = useState<WifiAP[]>([])
-	const [loading, setLoading] = useState(true)
+	const [loading, setLoading] = useState(false)
 	const [status, setStatus] = useState(message.scanBle)
 	const isConnecting = useRef(false)
 	const [currentStep, setCurrentStep] = useState(1)
