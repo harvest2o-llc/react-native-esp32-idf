@@ -185,12 +185,14 @@ export type MessageInfo = {
 type ProvisioningProps = {
 	devicePrefix: string | null
 	pop?: string | null
-	message: MessageInfo
+	message: MessageInfo,
+  searchForWifi: Boolean
 }
 export function useProvisioning({
 	devicePrefix,
 	pop = null,
 	message,
+  searchForWifi = true,
 }: ProvisioningProps) {
 	console.log('Invoke func useProvisioning')
 	const msg = useRef<MessageInfo>(message)
@@ -271,7 +273,7 @@ export function useProvisioning({
 				if (currentStep === 1 && !isConnecting.current) {
 					RNEsp32Idf.startBleScan(devicePrefix)
 					setBleDevices([])
-				} else if (currentStep === 2) {
+				} else if (searchForWifi && currentStep === 2) {
 					RNEsp32Idf.startWifiScan()
 				}
 			} else {
@@ -315,7 +317,9 @@ export function useProvisioning({
 			console.log('Event connection', event)
 			switch (event.status) {
 				case 1: //connected
-					RNEsp32Idf.startWifiScan()
+          if (searchForWifi) {
+            RNEsp32Idf.startWifiScan()
+          }
 					setCurrentStep(2)
 					setLoading(true)
 					setStatus(msg.current.scanWifi)
