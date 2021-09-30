@@ -72,9 +72,7 @@ class Esp32IdfModule(reactContext: ReactApplicationContext) :
 
         override fun onPeripheralFound(device: BluetoothDevice, scanResult: ScanResult) {
           Log.d(TAG, "====== onPeripheralFound ===== " + device.name)
-
           var serviceUuid: String? = null
-          var mAddress: String? = device.address
           val scanRecord = scanResult.scanRecord
           if (scanRecord?.serviceUuids != null && scanRecord.serviceUuids.size > 0) {
             serviceUuid = scanRecord.serviceUuids[0].toString()
@@ -84,7 +82,7 @@ class Esp32IdfModule(reactContext: ReactApplicationContext) :
             Log.d(TAG, "Add service UUID : $serviceUuid")
 
             val params =
-                mapOf("deviceName" to scanRecord!!.deviceName, "serviceUuid" to serviceUuid, "mAddress" to mAddress)
+                mapOf("deviceName" to scanRecord!!.deviceName, "serviceUuid" to serviceUuid)
             sendEvent(EVENT_SCAN_BLE, Arguments.makeNativeMap(params))
           }
         }
