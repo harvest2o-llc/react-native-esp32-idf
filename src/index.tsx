@@ -214,6 +214,10 @@ export function useProvisioning({
 	const currentWifi = useRef<WifiAP>()
 	const currentDevice = useRef<BleDevice>()
 
+  function resetDevices() {
+    setBleDevices([])
+  }
+
 	function connectDevice(bleDevice: BleDevice) {
 		if (isConnecting.current) return
 		isConnecting.current = true
@@ -376,6 +380,7 @@ export function useProvisioning({
 		connectDevice,
 		configWifi,
 		doProvisioning,
+    resetDevices
 	}
 }
 
