@@ -74,17 +74,22 @@ class Esp32IdfModule(reactContext: ReactApplicationContext) :
           Log.d(TAG, "====== onPeripheralFound ===== " + device.name)
 
           var serviceUuid: String? = null
-          var mAddress: String? = device.address
+          var deviceName: String? = device.getName()
+
           val scanRecord = scanResult.scanRecord
+
           if (scanRecord?.serviceUuids != null && scanRecord.serviceUuids.size > 0) {
             serviceUuid = scanRecord.serviceUuids[0].toString()
           }
-          if (serviceUuid != null && !bluetoothDevices.containsKey(serviceUuid)) {
-            bluetoothDevices[serviceUuid] = device
-            Log.d(TAG, "Add service UUID : $serviceUuid")
+          /* combination of device and name is unique. If we store this in map - it can store several devices. */
+          val insertKey: String = deviceName + "_" + serviceUuid.toString()
+
+          if (serviceUuid != null && !bluetoothDevices.containsKey(insertKey)) {
+            bluetoothDevices[insertKey] = device
+            Log.d(TAG, "Add service UUID with key: $insertKey")
 
             val params =
-                mapOf("deviceName" to scanRecord!!.deviceName, "serviceUuid" to serviceUuid, "mAddress" to mAddress)
+                mapOf("deviceName" to deviceName, "serviceUuid" to serviceUuid)
             sendEvent(EVENT_SCAN_BLE, Arguments.makeNativeMap(params))
           }
         }
@@ -149,7 +154,16 @@ class Esp32IdfModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun connectDevice(uuid: String, pop: String?, p: Promise) {
-    if (!bluetoothDevices.containsKey(uuid)) {
+
+    var checkKey: String? = ""
+
+    for ((k, v) in bluetoothDevices) {
+        if (k.contains(uuid)) {
+            checkKey = k
+        }
+    }
+
+    if (!bluetoothDevices.containsKey(checkKey)) {
       p.reject("NO_DEVICE", "Can't find the device: $uuid.")
     }
     p.resolve(true)
@@ -161,7 +175,7 @@ class Esp32IdfModule(reactContext: ReactApplicationContext) :
     if (pop != null) {
       espDevice.proofOfPossession = pop
     }
-    espDevice.connectBLEDevice(bluetoothDevices[uuid], uuid)
+    espDevice.connectBLEDevice(bluetoothDevices[checkKey], uuid)
   }
 
     override fun getName(): String {

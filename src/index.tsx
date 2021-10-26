@@ -303,7 +303,7 @@ export function useProvisioning({
 				setBleDevices(event)
 			} else if ((event as BleDevice).deviceName) {
 				setBleDevices((prev) =>
-					prev.some((it) => it.serviceUuid === (event as BleDevice).serviceUuid)
+					prev.some((it) => it.deviceName === (event as BleDevice).deviceName)
 						? prev
 						: prev.concat(event as BleDevice)
 				)
